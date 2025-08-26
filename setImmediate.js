@@ -11,18 +11,22 @@
     var doc = global.document;
     var registerImmediate;
 
+    function functionBind(fn, thisArg, args) {
+      // Function.prototype.bind polyfill for ES3
+      return function() {
+        return fn.call(thisArg, args.concat(Array.prototype.slice.call(arguments, 0)));
+      }
+    }
+
     function setImmediate(callback) {
       // Callback can either be a function or a string
       if (typeof callback !== "function") {
         callback = new Function("" + callback);
       }
       // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
+      var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : null;
       // Store and register the task
-      var task = { callback: callback, args: args };
+      var task = args ? callback : functionBind(callback, null, args);
       tasksByHandle[nextHandle] = task;
       registerImmediate(nextHandle);
       return nextHandle++;
@@ -33,25 +37,7 @@
     }
 
     function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
+        callback.call(null);
     }
 
     function runIfPresent(handle) {
