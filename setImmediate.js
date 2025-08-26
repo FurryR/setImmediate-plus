@@ -37,7 +37,7 @@
     }
 
     function run(task) {
-        callback.call();
+        task.call();
     }
 
     function runIfPresent(handle) {
