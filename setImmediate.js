@@ -26,7 +26,7 @@
       // Copy function arguments
       var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : null;
       // Store and register the task
-      var task = args ? callback : functionBind(callback, undefined, args);
+      var task = args ? functionBind(callback, undefined, args) : callback;
       tasksByHandle[nextHandle] = task;
       registerImmediate(nextHandle);
       return nextHandle++;
